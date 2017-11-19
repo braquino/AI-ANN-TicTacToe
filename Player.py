@@ -24,9 +24,9 @@ class Player(object):
     def train_ann(self, plays_data, batch=100, epochs=100):
         # prepare data from an 2d list with 30 cols
         plays_data = plays_data[1::2]
-        for i,v in enumerate(plays_data):
-            plays_data[i] += [self.game_win[plays_data[i][0]]]
-        dataset = list(filter(lambda x: x[29] == x[28] =='X',plays_data))
+#        for i,v in enumerate(plays_data):
+#            plays_data[i] += [self.game_win[plays_data[i][0]]]
+        dataset = list(filter(lambda x: x[28] == self.player, plays_data))
         dataset = numpy.asarray(dataset)[:,1:28]
         dataset = dataset.astype(int)
         X = dataset[:,:18]
@@ -34,7 +34,7 @@ class Player(object):
         # split data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
         # do the work
-        self.ann.fit(X_train, y_train, batch_size = 100, epochs = 100)
+        self.ann.fit(X_train, y_train, batch_size = batch, epochs = epochs)
     
     def play(self, board):
         # Run the ANN
@@ -51,10 +51,8 @@ class Player(object):
             result[i] = list(result[i])
             result[i][1] += result[i-1][1]
         rand = random.uniform(0,result[-1][1])
-        for n,v in result:
-            if v > rand:
-                move = n
-        return move
+        move_list = [n for n,v in result if v > rand]    
+        return move_list[0]
         
     def save(self):
         self.ann.save_weights(self.path)

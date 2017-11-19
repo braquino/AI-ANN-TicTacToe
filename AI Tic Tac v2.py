@@ -5,6 +5,9 @@ from Player import Player
 from Game import Game
 from Board import Board
 from Player_rec import Player_rec
+from Player_human import Player_human
+import csv
+
 
 # ============================================================================================
 
@@ -12,8 +15,23 @@ g = Game()
 b = Board()
 pX = Player('X', 'px.h5')
 pO = Player('O', 'po.h5')
+pHX = Player_human('X')
+pHO = Player_human('O')
 pR = Player_rec('O','px.h5')
-g.auto_game(b, pX, pR)
-plays = g.plays
+for i in range(5):
+    g.auto_game(b, pHX, pO, i)
+#
+## Save file
+with open('games.csv', 'a', newline='') as file:
+    wr = csv.writer(file)
+    wr.writerows(g.plays[1:])
+#
+## load file
+plays = []    
+with open('games.csv', 'r') as read:
+    reader = csv.reader(read, delimiter=',')
+    for row in reader:
+        plays.append(row)    
 
-
+pO.train_ann(plays, 100, 100)
+pX.train_ann(plays, 100, 100)
